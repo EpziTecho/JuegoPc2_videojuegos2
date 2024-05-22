@@ -21,7 +21,14 @@ var enemigosObjetivo = 30; // Establecer la cantidad de enemigos a derrotar
 var Juego = {
     preload: function () {
         juego.load.image("bg", "img/bg2.png");
-        juego.load.spritesheet("personaje", "img/personaje.png", 48, 58);
+        for (let i = 1; i <= 6; i++) {
+            juego.load.spritesheet(
+                "personaje" + i,
+                "img/personaje" + i + ".png",
+                48,
+                58
+            );
+        }
         juego.load.spritesheet("carroMalo", "img/ENEMIGOS.png", 48, 48);
         juego.load.image("gasolina", "img/gas.png");
         juego.load.image("bala", "img/laser.png");
@@ -32,7 +39,15 @@ var Juego = {
 
     create: function () {
         fondo = juego.add.tileSprite(0, 0, 370, 768, "bg");
-        carro = juego.add.sprite(100, 600, "personaje");
+        var personajeSeleccionado =
+            parseInt(localStorage.getItem("personajeSeleccionado")) || 1;
+
+        // Crear el sprite del personaje con el índice correcto
+        carro = juego.add.sprite(
+            100,
+            600,
+            "personaje" + (personajeSeleccionado + 1)
+        ); // Asegúrate de que los nombres de los recursos son correctos
 
         carro.animations.add("movi", [0, 1, 2], 10, true);
         //animacion de movimiento a la izquierda

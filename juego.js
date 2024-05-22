@@ -21,7 +21,14 @@ var enemigosObjetivo = 2; // Establecer la cantidad de enemigos a derrotar
 var Juego = {
     preload: function () {
         juego.load.image("bg", "img/bg2.png");
-        juego.load.spritesheet("personaje", "img/personaje.png", 48, 58);
+        for (let i = 1; i <= 6; i++) {
+            juego.load.spritesheet(
+                "personaje" + i,
+                "img/personaje" + i + ".png",
+                48,
+                58
+            );
+        }
         juego.load.spritesheet("carroMalo", "img/ENEMIGOS.png", 48, 48);
         juego.load.image("gasolina", "img/gas.png");
         juego.load.image("bala", "img/laser.png");
@@ -32,30 +39,34 @@ var Juego = {
 
     create: function () {
         fondo = juego.add.tileSprite(0, 0, 370, 768, "bg");
-        carro = juego.add.sprite(100, 600, "personaje");
 
+        // Asegurarse de convertir el índice a número y manejar el índice correctamente
+        // Asegurarse de que el índice del personaje se convierte correctamente de string a número
+        var personajeSeleccionado =
+            parseInt(localStorage.getItem("personajeSeleccionado")) || 1;
+
+        // Crear el sprite del personaje con el índice correcto
+        carro = juego.add.sprite(
+            100,
+            600,
+            "personaje" + (personajeSeleccionado + 1)
+        ); // Asegúrate de que los nombres de los recursos son correctos
         carro.animations.add("movi", [0, 1, 2], 10, true);
-        //animacion de movimiento a la izquierda
         carro.animations.add("izquierda", [3, 4, 5], 10, true);
-        //animacion de movimiento a la derecha
         carro.animations.add("derecha", [6, 7, 8], 10, true);
         carro.anchor.setTo(0.5);
         juego.physics.enable(carro, Phaser.Physics.ARCADE);
+        console.log(
+            "Índice del personaje seleccionado: ",
+            personajeSeleccionado
+        );
 
         botonDisparo = juego.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        textoPuntos = juego.add.text(20, 20, "Puntos: 0", {
-            font: "14px Arial",
-            fill: "#fff",
-        });
-        textoVidas = juego.add.text(20, 40, "Vidas: 3", {
-            font: "14px Arial",
-            fill: "#fff",
-        });
 
         enemigos = juego.add.group();
         enemigos.enableBody = true;
         enemigos.physicsBodyType = Phaser.Physics.ARCADE;
-        enemigos.createMultiple(20, "carroMalo"); // Crear hasta 20 enemigos, ajustar según necesidad
+        enemigos.createMultiple(20, "carroMalo");
         enemigos.setAll("anchor.x", 0.5);
         enemigos.setAll("anchor.y", 0.5);
         enemigos.setAll("outOfBoundsKill", true);
@@ -65,8 +76,8 @@ var Juego = {
         balas.enableBody = true;
         balas.physicsBodyType = Phaser.Physics.ARCADE;
         balas.createMultiple(20, "bala");
-        balas.setAll("anchor.x", 0);
-        balas.setAll("anchor.y", 0.2);
+        balas.setAll("anchor.x", 1.5);
+        balas.setAll("anchor.y", 1.5);
         balas.setAll("outOfBoundsKill", true);
         balas.setAll("checkWorldBounds", true);
 
@@ -86,6 +97,17 @@ var Juego = {
         teclaIzquierda = juego.input.keyboard.addKey(Phaser.Keyboard.LEFT);
         teclaArriba = juego.input.keyboard.addKey(Phaser.Keyboard.UP);
         teclaAbajo = juego.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+
+        botonDisparo = juego.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        textoPuntos = juego.add.text(20, 20, "Puntos: 0", {
+            font: "14px Arial",
+            fill: "#fff",
+        });
+        textoVidas = juego.add.text(20, 40, "Vidas: 3", {
+            font: "14px Arial",
+            fill: "#fff",
+        });
+
         var audio = juego.add.audio("audio");
         audio.play();
     },

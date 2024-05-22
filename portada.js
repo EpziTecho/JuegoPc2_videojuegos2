@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     var juego = new Phaser.Game(370, 768, Phaser.CANVAS, "bloque_juego");
+    var personajeSeleccionado = localStorage.getItem("personajeSeleccionado"); // Recupera el índice del personaje seleccionado
     var estadoPortada = {
         preload: function () {
             juego.load.image("fondo", "img/fondo-semana4.png");
@@ -7,6 +8,20 @@ document.addEventListener("DOMContentLoaded", function () {
             juego.load.image("boton_player1", "img/button_player1.png");
             juego.load.image("boton_player2", "img/button_player2.png");
             juego.load.image("boton_creditos", "img/button_credis-game.png");
+            juego.load.image(
+                "boton_seleccionar",
+                "img/button_select-character.png"
+            );
+            juego.load.image("fondo", "img/fondo-semana4.png");
+            // Cargar sprites para todos los personajes
+            for (let i = 1; i <= 6; i++) {
+                juego.load.spritesheet(
+                    "personaje" + i,
+                    "img/personaje" + i + ".png",
+                    48,
+                    58
+                );
+            }
             juego.load.audio("audio", "audio/audio.mp3");
         },
         create: function () {
@@ -31,9 +46,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
             var distanciaEntreBotones = 10;
 
-            var botonPlayer1 = juego.add.button(
+            var botonSeleccionar = juego.add.button(
                 juego.world.centerX,
                 botonJugar.y + botonJugar.height + distanciaEntreBotones,
+                "boton_seleccionar",
+                this.seleccionarPersonaje,
+                this,
+                2,
+                1,
+                0
+            );
+            botonSeleccionar.fixedToCamera = true;
+            botonSeleccionar.anchor.setTo(0.5, 0);
+            botonSeleccionar.events.onInputOver.add(this.hoverOver, this);
+            botonSeleccionar.events.onInputOut.add(this.hoverOut, this);
+
+            var botonPlayer1 = juego.add.button(
+                juego.world.centerX,
+                botonSeleccionar.y +
+                    botonSeleccionar.height +
+                    distanciaEntreBotones,
                 "boton_player1",
                 this.iniciarPlayer1,
                 this,
@@ -76,6 +108,9 @@ document.addEventListener("DOMContentLoaded", function () {
             botonCreditos.events.onInputOver.add(this.hoverOver, this);
             botonCreditos.events.onInputOut.add(this.hoverOut, this);
 
+            var audio = juego.add.audio("audio");
+            audio.play();
+
             var texto = juego.add.text(
                 juego.world.centerX,
                 juego.world.height - 20,
@@ -102,12 +137,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             );
             titulo.anchor.setTo(0.5);
-
+            // Mostrar el personaje seleccionado
+            // Mostrar el personaje seleccionado
+            var spritePersonaje = juego.add.sprite(
+                juego.world.centerX,
+                juego.world.centerY,
+                "personaje" + (parseInt(personajeSeleccionado) + 1)
+            );
+            spritePersonaje.anchor.setTo(0.5);
+            spritePersonaje.scale.setTo(2);
+            spritePersonaje.animations.add("idle", [0, 1, 2], 10, true);
+            spritePersonaje.animations.play("idle");
             var audio = juego.add.audio("audio");
             audio.play();
         },
         iniciarJuego: function () {
             window.location.href = "nivel1.html";
+        },
+        seleccionarPersonaje: function () {
+            window.location.href = "personaje.html";
         },
         iniciarPlayer1: function () {
             console.log("Iniciar Jugador 1");
