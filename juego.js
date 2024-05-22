@@ -43,7 +43,7 @@ var Juego = {
         // Asegurarse de convertir el índice a número y manejar el índice correctamente
         // Asegurarse de que el índice del personaje se convierte correctamente de string a número
         var personajeSeleccionado =
-            parseInt(localStorage.getItem("personajeSeleccionado")) || 1;
+            parseInt(localStorage.getItem("personajeSeleccionado")) || 0;
 
         // Crear el sprite del personaje con el índice correcto
         carro = juego.add.sprite(
@@ -152,9 +152,9 @@ var Juego = {
         ) {
             carro.animations.play("movi");
         }
-        if (juego.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-            this.disparar();
-        }
+        // if (juego.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+        //     this.disparar();
+        // }
 
         juego.physics.arcade.overlap(
             balas,

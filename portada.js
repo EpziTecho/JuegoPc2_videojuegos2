@@ -138,10 +138,9 @@ document.addEventListener("DOMContentLoaded", function () {
             );
             titulo.anchor.setTo(0.5);
             // Mostrar el personaje seleccionado
-            // Mostrar el personaje seleccionado
             var spritePersonaje = juego.add.sprite(
                 juego.world.centerX,
-                juego.world.centerY,
+                juego.world.centerY - 150,
                 "personaje" + (parseInt(personajeSeleccionado) + 1)
             );
             spritePersonaje.anchor.setTo(0.5);

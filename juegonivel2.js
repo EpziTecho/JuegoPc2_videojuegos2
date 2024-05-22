@@ -40,7 +40,7 @@ var Juego = {
     create: function () {
         fondo = juego.add.tileSprite(0, 0, 370, 768, "bg");
         var personajeSeleccionado =
-            parseInt(localStorage.getItem("personajeSeleccionado")) || 1;
+            parseInt(localStorage.getItem("personajeSeleccionado")) || 0;
 
         // Crear el sprite del personaje con el índice correcto
         carro = juego.add.sprite(
@@ -145,9 +145,9 @@ var Juego = {
         ) {
             carro.animations.play("movi");
         }
-        if (juego.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-            this.disparar();
-        }
+        // if (juego.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+        //     this.disparar();
+        // }
 
         juego.physics.arcade.overlap(
             balas,
