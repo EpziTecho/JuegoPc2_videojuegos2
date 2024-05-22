@@ -17,6 +17,11 @@ var vidas = 3;
 var textoPuntos;
 var textoVidas;
 var enemigosObjetivo = 2; // Establecer la cantidad de enemigos a derrotar
+var velocidadPersonaje = 5;
+
+// Variables para configurar el spawn de enemigos
+var velocidadSpawn = 3000; // tiempo en milisegundos
+var cantidadEnemigosSpawn = 1; // cantidad de enemigos por spawn
 
 var Juego = {
     preload: function () {
@@ -107,7 +112,12 @@ var Juego = {
             font: "14px Arial",
             fill: "#fff",
         });
-
+        // Timer para crear enemigos más rápidamente y en mayor cantidad
+        timer = juego.time.events.loop(
+            velocidadSpawn,
+            this.crearCarroMalo,
+            this
+        );
         var audio = juego.add.audio("audio");
         audio.play();
     },
@@ -120,23 +130,23 @@ var Juego = {
         // Movimiento horizontal del personaje principal
         if (teclaDerecha.isDown && carro.x < juego.width - carro.width) {
             carro.animations.play("derecha");
-            carro.x++;
+            carro.x += velocidadPersonaje;
             moving = true; // Está en movimiento
         } else if (teclaIzquierda.isDown && carro.x > 0) {
             carro.animations.play("izquierda");
-            carro.x--;
+            carro.x -= velocidadPersonaje;
             moving = true; // Está en movimiento
         }
 
         // Movimiento vertical del personaje principal
         if (teclaArriba.isDown && carro.y > 0) {
-            carro.y--;
+            carro.y -= velocidadPersonaje;
             if (!moving) {
                 // Solo reproducir animación de movi si no se mueve horizontalmente
                 carro.animations.play("movi");
             }
         } else if (teclaAbajo.isDown && carro.y < juego.height - carro.height) {
-            carro.y++;
+            carro.y += velocidadPersonaje;
             if (!moving) {
                 // Solo reproducir animación de movi si no se mueve horizontalmente
                 carro.animations.play("movi");
@@ -171,6 +181,26 @@ var Juego = {
             null,
             this
         );
+        juego.physics.arcade.overlap(
+            balas,
+            enemigos,
+            this.explosion,
+            null,
+            this
+        );
+        juego.physics.arcade.overlap(carro, enemigos, this.choque, null, this);
+        juego.physics.arcade.overlap(
+            carro,
+            gasolinas,
+            this.recogerGasolina,
+            null,
+            this
+        );
+
+        // Comprobar colisión con el borde superior para avanzar de nivel
+        if (carro.y <= 0) {
+            this.iniciarFadeoutnextLevel("nivel2.html");
+        }
     },
 
     disparar: function () {
@@ -216,11 +246,14 @@ var Juego = {
     },
 
     crearCarroMalo: function () {
-        var posicion = Math.floor(Math.random() * 3) + 1;
-        var enemigo = enemigos.getFirstDead();
-        enemigo.reset(posicion * 73, 0);
-        enemigo.body.velocity.y = 200;
-        enemigo.anchor.setTo(0.5);
+        for (var i = 0; i < cantidadEnemigosSpawn; i++) {
+            var posicion = Math.floor(Math.random() * juego.width);
+            var enemigo = enemigos.getFirstDead();
+            if (enemigo) {
+                enemigo.reset(posicion, 0);
+                enemigo.body.velocity.y = 200;
+            }
+        }
     },
 
     crearGasolina: function () {
@@ -240,7 +273,7 @@ var Juego = {
         var text = juego.add.text(
             juego.world.centerX,
             juego.world.centerY,
-            "Nivel 2 en 3",
+            "Llegaste a tiempo",
             {
                 font: "40px Arial",
                 fill: "#ffffff",
@@ -278,7 +311,7 @@ var Juego = {
         var text = juego.add.text(
             juego.world.centerX,
             juego.world.centerY,
-            "Mision cumplida",
+            "No llegaras a tiempo",
             {
                 font: "40px Arial",
                 fill: "#ffffff",
