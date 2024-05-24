@@ -1,0 +1,16 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    display: block;
+    background: #000; /* Color de fondo, opcional */
+    overflow: hidden; /* Evita desplazamiento no deseado */
+}
+
+#bloque_juego {
+    width: 370px; /* Asegúrate de que el ancho coincida con el de tu juego */
+    height: 768px; /* Asegúrate de que la altura coincida con la de tu juego */
+    margin: auto;
+    position: relative; /* Opcional, dependiendo de otros estilos que puedas tener */
+    top: 50%;
+    transform: translateY(-50%);
+}

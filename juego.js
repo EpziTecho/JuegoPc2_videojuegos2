@@ -231,9 +231,45 @@ var Juego = {
     },
 
     choque: function (carro, enemigo) {
-        enemigo.kill();
+        if (carro.recentlyHit) return; // Si ya fue golpeado recientemente, no hacer nada
+
+        carro.recentlyHit = true; // Marcar que el carro ha sido golpeado
+        juego.time.events.add(
+            Phaser.Timer.SECOND * 0.5,
+            function () {
+                carro.recentlyHit = false; // Resetea la condición después de 0.5 segundos
+            },
+            this
+        );
+
+        // Disminuir la vida del jugador
         vidas--;
         textoVidas.text = "Vidas: " + vidas;
+
+        // Aplica el rebote
+        var intensidadRebote = 90;
+        carro.body.velocity.y = intensidadRebote; // Empuja al carro ligeramente hacia arriba
+        enemigo.body.velocity.y = -intensidadRebote; // Empuja al enemigo ligeramente hacia abajo para simular un rebote
+
+        // Detener el movimiento del carro después de un corto período, pero dejar que el enemigo siga su camino
+        juego.time.events.add(
+            Phaser.Timer.SECOND * 0.2,
+            function () {
+                carro.body.velocity.y = 0; // Detiene el movimiento del carro después del rebote
+            },
+            this
+        );
+
+        // Permitir que el enemigo retome su velocidad de caída después del rebote
+        juego.time.events.add(
+            Phaser.Timer.SECOND * 0.2,
+            function () {
+                enemigo.body.velocity.y = 200; // Restablece la velocidad de caída del enemigo
+            },
+            this
+        );
+
+        // Verificar si el jugador se quedó sin vidas
         if (vidas === 0) {
             this.iniciarFadeOutGameOver("index.html");
         }
