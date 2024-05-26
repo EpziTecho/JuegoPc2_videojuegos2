@@ -24,6 +24,7 @@ var velocidadSpawn = 3000; // tiempo en milisegundos
 var cantidadEnemigosSpawn = 1; // cantidad de enemigos por spawn
 var Juego = {
     preload: function () {
+        juego.load.image("bg3", "img/bg3.png");
         juego.load.image("bg", "img/bg2.png");
         for (let i = 1; i <= 6; i++) {
             juego.load.spritesheet(
@@ -33,6 +34,9 @@ var Juego = {
                 58
             );
         }
+
+        juego.load.spritesheet("puertas", "img/bg2_bembos.png", 370, 48);
+
         juego.load.spritesheet("carroMalo", "img/ENEMIGOS.png", 48, 48);
         juego.load.image("gasolina", "img/gas.png");
         juego.load.image("bala", "img/laser.png");
@@ -52,6 +56,16 @@ var Juego = {
             600,
             "personaje" + (personajeSeleccionado + 1)
         ); // Asegúrate de que los nombres de los recursos son correctos
+
+        var fondo2 = juego.add.sprite(0, 0, "bg3");
+        fondo2.scale.setTo(juego.width / fondo2.width, juego.height / fondo2.height);
+
+        var puertas = juego.add.sprite(0, 0, "puertas");
+        puertas.animations.add("abrirCerrar", [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
+        puertas.animations.play("abrirCerrar");
+        puertas.scale.setTo(juego.width / puertas.width, 1);
+
+
 
         carro.animations.add("movi", [0, 1, 2], 10, true);
         //animacion de movimiento a la izquierda

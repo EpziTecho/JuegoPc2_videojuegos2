@@ -18,6 +18,7 @@ var textoPuntos;
 var textoVidas;
 var enemigosObjetivo = 2; // Establecer la cantidad de enemigos a derrotar
 var velocidadPersonaje = 5;
+var scrollingSpeed = 3; // Velocidad del scroll vertical
 
 // Variables para configurar el spawn de enemigos
 var velocidadSpawn = 3000; // tiempo en milisegundos
@@ -25,6 +26,9 @@ var cantidadEnemigosSpawn = 1; // cantidad de enemigos por spawn
 
 var Juego = {
     preload: function () {
+
+        juego.load.image("bg3", "img/bg3.png");
+
         juego.load.image("bg", "img/bg2.png");
         for (let i = 1; i <= 6; i++) {
             juego.load.spritesheet(
@@ -34,16 +38,36 @@ var Juego = {
                 58
             );
         }
+
+        juego.load.spritesheet("puertas", "img/bg2_asensores_puertas.png", 370, 48);
         juego.load.spritesheet("carroMalo", "img/ENEMIGOS.png", 48, 48);
         juego.load.image("gasolina", "img/gas.png");
         juego.load.image("bala", "img/laser.png");
         juego.load.audio("disparo", "audio/laser.mp3");
         juego.load.audio("explosion", "audio/explosion.mp3");
         juego.load.audio("audio", "audio/audio.mp3");
+        
     },
 
     create: function () {
+
         fondo = juego.add.tileSprite(0, 0, 370, 768, "bg");
+        fondo.scale.setTo(juego.width / fondo.width, juego.height / fondo.height);
+        // Deshabilita el scroll horizontal
+        juego.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+        juego.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        juego.scale.refresh();
+        juego.world.setBounds(0, 0, fondo.width, fondo.height);
+
+        var fondo2 = juego.add.sprite(0, 0, "bg3");
+        fondo2.scale.setTo(juego.width / fondo2.width, juego.height / fondo2.height);
+
+        var puertas = juego.add.sprite(0, 0, "puertas");
+        puertas.animations.add("abrirCerrar", [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
+        puertas.animations.play("abrirCerrar");
+        puertas.scale.setTo(juego.width / puertas.width, 1);
+
+        
 
         // Asegurarse de convertir el índice a número y manejar el índice correctamente
         // Asegurarse de que el índice del personaje se convierte correctamente de string a número
@@ -123,6 +147,8 @@ var Juego = {
     },
 
     update: function () {
+
+        fondo.tilePosition.y += scrollingSpeed;
         fondo.tilePosition.y += 3;
 
         var moving = false; // Rastreo de movimiento del personaje

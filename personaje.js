@@ -4,30 +4,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var estadoPortada = {
         preload: function () {
-            juego.load.image("fondo", "img/fondo-semana4.png");
-            juego.load.image(
-                "boton_seleccionar",
-                "img/button_select-character.png"
-            );
+            juego.load.image("fondo", "img/seleccion.png"); // Cargar el nuevo fondo estático
+            juego.load.image("boton_seleccionar", "img/button_select-character.png");
             juego.load.image("boton_seleccionar", "img/button_select.png"); // Asegúrate de tener esta imagen en tus archivos
             for (let i = 1; i <= 6; i++) {
-                juego.load.spritesheet(
-                    "personaje" + i,
-                    "img/personaje" + i + ".png",
-                    48,
-                    58
-                );
-                juego.load.spritesheet(
-                    "personaje" + i + "_vista_frente",
-                    "img/personaje" + i + "_vista_frente.png",
-                    48,
-                    58
-                );
+                juego.load.spritesheet("personaje" + i, "img/personaje" + i + ".png", 48, 58);
+                juego.load.spritesheet("personaje" + i + "_vista_frente", "img/personaje" + i + "_vista_frente.png", 48, 58);
             }
             juego.load.audio("audio", "audio/audio.mp3");
         },
         create: function () {
-            var fondo = juego.add.tileSprite(0, 0, 370, 768, "fondo");
+            var fondo = juego.add.sprite(0, 0, "fondo");
+            fondo.width = juego.width;
+            fondo.height = juego.height;
+
             // Textos de diseño y título
             var texto = juego.add.text(
                 juego.world.centerX,
@@ -99,12 +89,8 @@ document.addEventListener("DOMContentLoaded", function () {
             var audio = juego.add.audio("audio");
             audio.play();
 
-            this.teclaIzquierda = juego.input.keyboard.addKey(
-                Phaser.Keyboard.LEFT
-            );
-            this.teclaDerecha = juego.input.keyboard.addKey(
-                Phaser.Keyboard.RIGHT
-            );
+            this.teclaIzquierda = juego.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+            this.teclaDerecha = juego.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
             this.keyPressed = false;
         },
         update: function () {
@@ -114,18 +100,13 @@ document.addEventListener("DOMContentLoaded", function () {
             } else if (this.teclaDerecha.isDown && !this.keyPressed) {
                 this.cambiarPersonaje(1);
                 this.keyPressed = true;
-            } else if (
-                !this.teclaIzquierda.isDown &&
-                !this.teclaDerecha.isDown
-            ) {
+            } else if (!this.teclaIzquierda.isDown && !this.teclaDerecha.isDown) {
                 this.keyPressed = false;
             }
         },
         cambiarPersonaje: function (direccion) {
             let indiceActual = this.personajes.findIndex((p) => p.visible);
-            let nuevoIndice =
-                (indiceActual + direccion + this.personajes.length) %
-                this.personajes.length;
+            let nuevoIndice = (indiceActual + direccion + this.personajes.length) % this.personajes.length;
             this.personajes[indiceActual].visible = false;
             this.personajesVistaFrente[indiceActual].visible = false;
             this.personajes[nuevoIndice].visible = true;
@@ -133,10 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
             personajeSeleccionado = nuevoIndice;
         },
         finalizarSeleccion: function () {
-            localStorage.setItem(
-                "personajeSeleccionado",
-                personajeSeleccionado
-            );
+            localStorage.setItem("personajeSeleccionado", personajeSeleccionado);
             window.location.href = "index.html";
         },
     };
