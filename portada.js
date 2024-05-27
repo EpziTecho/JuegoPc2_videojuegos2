@@ -72,41 +72,11 @@ document.addEventListener("DOMContentLoaded", function () {
             botonSeleccionar.events.onInputOver.add(this.hoverOver, this);
             botonSeleccionar.events.onInputOut.add(this.hoverOut, this);
 
-            var botonPlayer1 = juego.add.button(
+            var botonCreditos = juego.add.button(
                 juego.world.centerX,
                 botonSeleccionar.y +
                     botonSeleccionar.height +
                     distanciaEntreBotones,
-                "boton_player1",
-                this.iniciarPlayer1,
-                this,
-                2,
-                1,
-                0
-            );
-            botonPlayer1.fixedToCamera = true;
-            botonPlayer1.anchor.setTo(0.5, 0);
-            botonPlayer1.events.onInputOver.add(this.hoverOver, this);
-            botonPlayer1.events.onInputOut.add(this.hoverOut, this);
-
-            var botonPlayer2 = juego.add.button(
-                juego.world.centerX,
-                botonPlayer1.y + botonPlayer1.height + distanciaEntreBotones,
-                "boton_player2",
-                this.iniciarPlayer2,
-                this,
-                2,
-                1,
-                0
-            );
-            botonPlayer2.fixedToCamera = true;
-            botonPlayer2.anchor.setTo(0.5, 0);
-            botonPlayer2.events.onInputOver.add(this.hoverOver, this);
-            botonPlayer2.events.onInputOut.add(this.hoverOut, this);
-
-            var botonCreditos = juego.add.button(
-                juego.world.centerX,
-                botonPlayer2.y + botonPlayer2.height + distanciaEntreBotones,
                 "boton_creditos",
                 this.mostrarCreditos,
                 this,
