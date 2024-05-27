@@ -19,6 +19,7 @@ var textoVidas;
 var enemigosObjetivo = 2; // Establecer la cantidad de enemigos a derrotar
 var velocidadPersonaje = 5;
 var scrollingSpeed = 3; // Velocidad del scroll vertical
+var juegoActivo = true;
 
 // Variables para configurar el spawn de enemigos
 var velocidadSpawn = 3000; // tiempo en milisegundos
@@ -26,7 +27,6 @@ var cantidadEnemigosSpawn = 1; // cantidad de enemigos por spawn
 
 var Juego = {
     preload: function () {
-
         juego.load.image("bg3", "img/bg3.png");
 
         juego.load.image("bg", "img/bg2.png");
@@ -39,20 +39,27 @@ var Juego = {
             );
         }
 
-        juego.load.spritesheet("puertas", "img/bg2_asensores_puertas.png", 370, 48);
+        juego.load.spritesheet(
+            "puertas",
+            "img/bg2_asensores_puertas.png",
+            370,
+            48
+        );
         juego.load.spritesheet("carroMalo", "img/ENEMIGOS.png", 48, 48);
         juego.load.image("gasolina", "img/gas.png");
         juego.load.image("bala", "img/laser.png");
         juego.load.audio("disparo", "audio/laser.mp3");
         juego.load.audio("explosion", "audio/explosion.mp3");
         juego.load.audio("audio", "audio/audio.mp3");
-        
     },
 
     create: function () {
-
+        juegoActivo = true; // El juego comienza activo
         fondo = juego.add.tileSprite(0, 0, 370, 768, "bg");
-        fondo.scale.setTo(juego.width / fondo.width, juego.height / fondo.height);
+        fondo.scale.setTo(
+            juego.width / fondo.width,
+            juego.height / fondo.height
+        );
         // Deshabilita el scroll horizontal
         juego.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
         juego.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -60,14 +67,20 @@ var Juego = {
         juego.world.setBounds(0, 0, fondo.width, fondo.height);
 
         var fondo2 = juego.add.sprite(0, 0, "bg3");
-        fondo2.scale.setTo(juego.width / fondo2.width, juego.height / fondo2.height);
+        fondo2.scale.setTo(
+            juego.width / fondo2.width,
+            juego.height / fondo2.height
+        );
 
         var puertas = juego.add.sprite(0, 0, "puertas");
-        puertas.animations.add("abrirCerrar", [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
+        puertas.animations.add(
+            "abrirCerrar",
+            [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            10,
+            true
+        );
         puertas.animations.play("abrirCerrar");
         puertas.scale.setTo(juego.width / puertas.width, 1);
-
-        
 
         // Asegurarse de convertir el índice a número y manejar el índice correctamente
         // Asegurarse de que el índice del personaje se convierte correctamente de string a número
@@ -89,6 +102,9 @@ var Juego = {
             "Índice del personaje seleccionado: ",
             personajeSeleccionado
         );
+
+        timer = juego.time.events.loop(1500, this.crearCarroMalo, this);
+        timerGasolina = juego.time.events.loop(2000, this.crearGasolina, this);
 
         botonDisparo = juego.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
@@ -128,13 +144,13 @@ var Juego = {
         teclaAbajo = juego.input.keyboard.addKey(Phaser.Keyboard.DOWN);
 
         botonDisparo = juego.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        textoPuntos = juego.add.text(20, 20, "Puntos: 0", {
-            font: "14px Arial",
-            fill: "#fff",
+        textoPuntos = juego.add.text(50, 680, "Puntos: 0", {
+            font: "14px Arial black",
+            fill: "black",
         });
-        textoVidas = juego.add.text(20, 40, "Vidas: 3", {
-            font: "14px Arial",
-            fill: "#fff",
+        textoVidas = juego.add.text(50, 700, "Choques: 3", {
+            font: "14px Arial black",
+            fill: "black",
         });
         // Timer para crear enemigos más rápidamente y en mayor cantidad
         timer = juego.time.events.loop(
@@ -147,85 +163,101 @@ var Juego = {
     },
 
     update: function () {
+        if (juegoActivo) {
+            fondo.tilePosition.y += scrollingSpeed;
+            fondo.tilePosition.y += 3;
 
-        fondo.tilePosition.y += scrollingSpeed;
-        fondo.tilePosition.y += 3;
+            var moving = false; // Rastreo de movimiento del personaje
 
-        var moving = false; // Rastreo de movimiento del personaje
+            // Movimiento horizontal del personaje principal
+            if (teclaDerecha.isDown && carro.x < juego.width - carro.width) {
+                carro.animations.play("derecha");
+                carro.x += velocidadPersonaje;
+                moving = true; // Está en movimiento
+            } else if (teclaIzquierda.isDown && carro.x > 0) {
+                carro.animations.play("izquierda");
+                carro.x -= velocidadPersonaje;
+                moving = true; // Está en movimiento
+            }
 
-        // Movimiento horizontal del personaje principal
-        if (teclaDerecha.isDown && carro.x < juego.width - carro.width) {
-            carro.animations.play("derecha");
-            carro.x += velocidadPersonaje;
-            moving = true; // Está en movimiento
-        } else if (teclaIzquierda.isDown && carro.x > 0) {
-            carro.animations.play("izquierda");
-            carro.x -= velocidadPersonaje;
-            moving = true; // Está en movimiento
-        }
+            // Movimiento vertical del personaje principal
+            if (teclaArriba.isDown && carro.y > 0) {
+                carro.y -= velocidadPersonaje;
+                if (!moving) {
+                    // Solo reproducir animación de movi si no se mueve horizontalmente
+                    carro.animations.play("movi");
+                }
+            } else if (
+                teclaAbajo.isDown &&
+                carro.y < juego.height - carro.height
+            ) {
+                carro.y += velocidadPersonaje;
+                if (!moving) {
+                    // Solo reproducir animación de movi si no se mueve horizontalmente
+                    carro.animations.play("movi");
+                }
+            }
 
-        // Movimiento vertical del personaje principal
-        if (teclaArriba.isDown && carro.y > 0) {
-            carro.y -= velocidadPersonaje;
-            if (!moving) {
-                // Solo reproducir animación de movi si no se mueve horizontalmente
+            // Si no se están presionando teclas de movimiento, reproducir animación de movi
+            if (
+                !teclaDerecha.isDown &&
+                !teclaIzquierda.isDown &&
+                !teclaArriba.isDown &&
+                !teclaAbajo.isDown
+            ) {
                 carro.animations.play("movi");
             }
-        } else if (teclaAbajo.isDown && carro.y < juego.height - carro.height) {
-            carro.y += velocidadPersonaje;
-            if (!moving) {
-                // Solo reproducir animación de movi si no se mueve horizontalmente
-                carro.animations.play("movi");
+            // if (juego.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+            //     this.disparar();
+            // }
+
+            juego.physics.arcade.overlap(
+                balas,
+                enemigos,
+                this.explosion,
+                null,
+                this
+            );
+            juego.physics.arcade.overlap(
+                carro,
+                enemigos,
+                this.choque,
+                null,
+                this
+            );
+            juego.physics.arcade.overlap(
+                carro,
+                gasolinas,
+                this.recogerGasolina,
+                null,
+                this
+            );
+            juego.physics.arcade.overlap(
+                balas,
+                enemigos,
+                this.explosion,
+                null,
+                this
+            );
+            juego.physics.arcade.overlap(
+                carro,
+                enemigos,
+                this.choque,
+                null,
+                this
+            );
+            juego.physics.arcade.overlap(
+                carro,
+                gasolinas,
+                this.recogerGasolina,
+                null,
+                this
+            );
+
+            // Comprobar colisión con el borde superior para avanzar de nivel
+            if (carro.y <= 0) {
+                this.finNivel1("nivel2.html");
             }
-        }
-
-        // Si no se están presionando teclas de movimiento, reproducir animación de movi
-        if (
-            !teclaDerecha.isDown &&
-            !teclaIzquierda.isDown &&
-            !teclaArriba.isDown &&
-            !teclaAbajo.isDown
-        ) {
-            carro.animations.play("movi");
-        }
-        // if (juego.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-        //     this.disparar();
-        // }
-
-        juego.physics.arcade.overlap(
-            balas,
-            enemigos,
-            this.explosion,
-            null,
-            this
-        );
-        juego.physics.arcade.overlap(carro, enemigos, this.choque, null, this);
-        juego.physics.arcade.overlap(
-            carro,
-            gasolinas,
-            this.recogerGasolina,
-            null,
-            this
-        );
-        juego.physics.arcade.overlap(
-            balas,
-            enemigos,
-            this.explosion,
-            null,
-            this
-        );
-        juego.physics.arcade.overlap(carro, enemigos, this.choque, null, this);
-        juego.physics.arcade.overlap(
-            carro,
-            gasolinas,
-            this.recogerGasolina,
-            null,
-            this
-        );
-
-        // Comprobar colisión con el borde superior para avanzar de nivel
-        if (carro.y <= 0) {
-            this.iniciarFadeoutnextLevel("nivel2.html");
         }
     },
 
@@ -257,6 +289,7 @@ var Juego = {
     },
 
     choque: function (carro, enemigo) {
+        if (!juegoActivo) return;
         if (carro.recentlyHit) return; // Si ya fue golpeado recientemente, no hacer nada
 
         carro.recentlyHit = true; // Marcar que el carro ha sido golpeado
@@ -270,10 +303,10 @@ var Juego = {
 
         // Disminuir la vida del jugador
         vidas--;
-        textoVidas.text = "Vidas: " + vidas;
+        textoVidas.text = "Choques: " + vidas;
 
         // Aplica el rebote
-        var intensidadRebote = 90;
+        var intensidadRebote = 200;
         carro.body.velocity.y = intensidadRebote; // Empuja al carro ligeramente hacia arriba
         enemigo.body.velocity.y = -intensidadRebote; // Empuja al enemigo ligeramente hacia abajo para simular un rebote
 
@@ -295,9 +328,10 @@ var Juego = {
             this
         );
 
-        // Verificar si el jugador se quedó sin vidas
-        if (vidas === 0) {
-            this.iniciarFadeOutGameOver("index.html");
+        if (vidas <= 0) {
+            vidas = 0; // Asegurar que las vidas no sean negativas
+            juegoActivo = false; // Desactivar el juego
+            this.iniciarFadeOutGameOver("index.html"); // Iniciar el proceso de game over
         }
     },
 
@@ -325,7 +359,19 @@ var Juego = {
         gasolina.body.velocity.y = 200;
         gasolina.anchor.setTo(0.5);
     },
+    finDelJuego: function (targetUrl) {
+        juegoActivo = false;
+        juego.time.events.remove(timer);
+        juego.time.events.remove(timerGasolina);
+        this.iniciarFadeOutGameOver(targetUrl);
+    },
 
+    finNivel1: function (targetUrl) {
+        juegoActivo = false;
+        juego.time.events.remove(timer);
+        juego.time.events.remove(timerGasolina);
+        this.iniciarFadeoutnextLevel("nivel2.html");
+    },
     iniciarFadeoutnextLevel: function () {
         var fadeOutSprite = juego.add.sprite(0, 0, "bg");
         fadeOutSprite.width = juego.width;
@@ -337,8 +383,8 @@ var Juego = {
             juego.world.centerY,
             "Llegaste a tiempo",
             {
-                font: "40px Arial",
-                fill: "#ffffff",
+                font: "30px Arial black",
+                fill: "black",
             }
         );
         text.anchor.setTo(0.5, 0.5);
@@ -375,8 +421,8 @@ var Juego = {
             juego.world.centerY,
             "No llegaras a tiempo",
             {
-                font: "40px Arial",
-                fill: "#ffffff",
+                font: "30px Arial black",
+                fill: "black",
             }
         );
         text.anchor.setTo(0.5, 0.5);

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     var juego = new Phaser.Game(370, 768, Phaser.CANVAS, "bloque_juego");
-    var personajeSeleccionado = localStorage.getItem("personajeSeleccionado"); // Recupera el índice del personaje seleccionado
+    var personajeSeleccionado = localStorage.getItem("personajeSeleccionado"); // Variable para guardar el índice del personaje seleccionado
 
     var estadoPortada = {
         preload: function () {
@@ -27,8 +27,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     48,
                     58
                 );
+                juego.load.spritesheet(
+                    "personaje" + i + "_vista_frente",
+                    "img/personaje" + i + "_vista_frente.png",
+                    48,
+                    58
+                );
             }
-            juego.load.audio("audio", "audio/audio.mp3");
+            juego.load.audio("audio", "audio/audio.mp3"); // Cargar audio
         },
         create: function () {
             var fondo = juego.add.sprite(0, 0, "fondo");
@@ -107,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var titulo = juego.add.text(
                 juego.world.centerX,
                 100,
-                "Space Shooter",
+                "UTP RUNNER",
                 {
                     font: "bold 48px Arial",
                     fill: "#ffffff",
@@ -120,11 +126,13 @@ document.addEventListener("DOMContentLoaded", function () {
             );
             titulo.anchor.setTo(0.5);
 
-            // Mostrar el personaje seleccionado
+            // Mostrar el personaje seleccionado en vista frontal
             var spritePersonaje = juego.add.sprite(
                 juego.world.centerX,
                 juego.world.centerY - 150,
-                "personaje" + (parseInt(personajeSeleccionado) + 1)
+                "personaje" +
+                    (parseInt(personajeSeleccionado) + 1) +
+                    "_vista_frente"
             );
             spritePersonaje.anchor.setTo(0.5);
             spritePersonaje.scale.setTo(2);

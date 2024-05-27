@@ -11,10 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
             fondo.width = juego.width;
             fondo.height = juego.height;
             var nombres = [
-                "Nombre Uno",
+                "Sergio Huayllas",
                 "Diego Miñano",
-                "Nombre Tres",
-                "Nombre Cuatro",
+                "Franco Garcia",
+                "Walter Siri",
             ];
             var yPos = juego.world.centerY - 100;
 
