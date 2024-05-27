@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var estadoCreditos = {
         preload: function () {
             juego.load.image("fondo", "img/creditos.png");
+            juego.load.image("boton_regresar", "img/btnVolver.png");
         },
         create: function () {
             var fondo = juego.add.sprite(0, 0, "fondo");
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fondo.height = juego.height;
             var nombres = [
                 "Nombre Uno",
-                "Nombre Dos",
+                "Diego Miñano",
                 "Nombre Tres",
                 "Nombre Cuatro",
             ];
